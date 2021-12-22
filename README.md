@@ -54,8 +54,8 @@ only showing top 20 rows
 ## Parameter
 **Decrypt method and Key:**
 
-In `decrypt_files.scala` class `decryptTask`, change these code according to your need.
+In `spark_read_encrypted_files.scala` class `decryptTask`, change these code according to your need.
 
 **Schema:**
-In `decrypt_files.scala` line 61, change schema according to your need.
+In `spark_read_encrypted_files.scala` line 61, change schema according to your need.
 
