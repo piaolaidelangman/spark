@@ -11,7 +11,6 @@ import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
-
 class decryptTask extends Serializable{
   val secret = "1111111111"
   val salt = "2222222222"
