@@ -5,8 +5,6 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
 
-// import scala.collection.mutable
-
 import java.nio.file.{Files, Paths}
 import java.util.Base64
 import java.security.SecureRandom
