@@ -11,10 +11,12 @@ import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
+import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
+
 class decryptTask extends Serializable{
   val secret = "1111111111"
   val salt = "2222222222"
-  
+  val validator = new StringValidator() {};
   def decryptWithAESGCM(content: String, keyLen: Int = 128): String = {
       new String(decryptBytesWithAESGCM(Base64.getDecoder.decode(content), keyLen))
   }
@@ -32,25 +34,44 @@ class decryptTask extends Serializable{
     val cipherTextWithoutIV = cipherTextWithIV.slice(12, cipherTextWithIV.length)
     cipher.doFinal(cipherTextWithoutIV)
   }
-
+  def decryptFile(content: Array[Byte], secret: String): String = {
+      val key = new Key(secret)
+      val token = Token.fromBytes(content)
+      token.validateAndDecrypt(key, validator)
+  }
 }
 object decrypt {
 
     def main(args: Array[String]): Unit = {
 
-        val input_path = args(0) // path to a txt which contains encrypted files' pwd
+        val inputPath = args(0) // path to a txt which contains encrypted files' pwd
+        val secret = args(1)
         
         val sc = new SparkContext()
+        // val validator = new StringValidator() {};
 
         val task: decryptTask = new decryptTask()
         
-        val input = sc.textFile(input_path)
-        val decryption = input.map{
-          row =>{
-            val byteArray = Files.readAllBytes(Paths.get(row))
-            new String(task.decryptBytesWithAESGCM(byteArray))
-          }
-        }// RDD[String] which contains decrypted files
+        // val input = sc.textFile(inputPath)
+        // val decryption = input.map{
+        //   row =>{
+        //     val byteArray = Files.readAllBytes(Paths.get(row))
+        //     new String(task.decryptBytesWithAESGCM(byteArray))
+        //   }
+        // }// RDD[String] which contains decrypted files
+
+        val decryption = sc.binaryFiles(inputPath)
+        .map{ case (name, bytesData) => { 
+          println("## success " + name)
+          task.decryptFile(bytesData.toArray, secret)
+
+          // val key = new Key(secret)
+          // val token = Token.fromBytes(bytesData.toArray)
+          // token.validateAndDecrypt(key, validator)
+
+          // Files.write(Paths.get(outputPath + name.split("/").last), task.encryptFile(bytesData.toArray, secret))
+          // name + " encrypt success"
+        }}
 
         val spark = SparkSession.builder().getOrCreate()
         import spark.implicits._
@@ -74,4 +95,5 @@ object decrypt {
         df.show()
     }
 }
+
 
