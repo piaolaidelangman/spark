@@ -14,7 +14,7 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
 class decryptTask extends Serializable{
   
   def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
-      new String(decryptBytesWithJavaAESGCM(Base64.getDecoder.decode(content), keyLen))
+      new String(decryptBytesWithJavaAESGCM(Base64.getDecoder.decode(content), secret, salt, keyLen))
   }
 
   def decryptBytesWithJavaAESGCM(content: Array[Byte], secret: String, salt: String, keyLen: Int = 128): Array[Byte] = {

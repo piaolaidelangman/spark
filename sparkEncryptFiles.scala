@@ -13,7 +13,7 @@ import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 class encryptTask extends Serializable{
 
  def encryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
-    Base64.getEncoder.encodeToString(encryptBytesWithJavaAESGCM(content.getBytes(), keyLen))
+    Base64.getEncoder.encodeToString(encryptBytesWithJavaAESGCM(content.getBytes(), secret, salt, keyLen))
   }
 
   def encryptBytesWithJavaAESGCM(content: Array[Byte], secret: String, salt: String, keyLen: Int = 128): Array[Byte] = {
