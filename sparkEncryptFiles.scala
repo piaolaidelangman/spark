@@ -46,24 +46,28 @@ object encryptFile {
         val outputPath = args(1)
         val encryptMethod = args(2)
         val secret = args(3)
+
         val sc = new SparkContext()
         val task = new encryptTask()
+
         if (encryptMethod == "Java"){
           val salt = args(4)
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             val tmpOutputPath = outputPath + name.split("/").last
             Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
-            tmpOutputPath + " Java encrypt success!"
-          }}.map(println)
+            tmpOutputPath + " Java encrypt successfully saved!"
+          }}
+          output.foreach(println)
 
         }else if (encryptMethod == "Fernet"){
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             val tmpOutputPath = outputPath + name.split("/").last
             Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithFernet(bytesData.toArray, secret))
-            tmpOutputPath + " Fernet encrypt success!"
-          }}.map(println)
+            tmpOutputPath + " Fernet encrypt successfully saved!"
+          }}
+          output.foreach(println)
         }else{
           println("Error! no such encrypt method!")
         }

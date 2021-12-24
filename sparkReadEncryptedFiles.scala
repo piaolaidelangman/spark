@@ -11,6 +11,12 @@ import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount
+
+import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
+
 class decryptTask extends Serializable{
   
   def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
@@ -52,15 +58,16 @@ object decryptFile {
 
         val sc = new SparkContext()
         val task: decryptTask = new decryptTask()
+        var decryption = sc.emptyRDD[String]
         
         if (encryptMethod == "Java"){
           val salt = args(3)
-          val decryption = sc.binaryFiles(inputPath)
+          decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
           }}.cache()
         }else if (encryptMethod == "Fernet"){
-          val decryption = sc.binaryFiles(inputPath)
+          decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             task.decryptBytesWithFernet(bytesData.toArray, secret)
           }}.cache()
