@@ -11,14 +11,12 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 
 class encryptTask extends Serializable{
-  val secret = "1111111111"
-  val salt = "2222222222"
 
- def encryptWithAESGCM(content: String, keyLen: Int = 128): String = {
-    Base64.getEncoder.encodeToString(encryptBytesWithAESGCM(content.getBytes(), keyLen))
+ def encryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
+    Base64.getEncoder.encodeToString(encryptBytesWithJavaAESGCM(content.getBytes(), keyLen))
   }
 
-  def encryptBytesWithAESGCM(content: Array[Byte], keyLen: Int = 128): Array[Byte] = {
+  def encryptBytesWithJavaAESGCM(content: Array[Byte], secret: String, salt: String, keyLen: Int = 128): Array[Byte] = {
     // Default IV len in GCM is 12
     val iv = new Array[Byte](12)
     val secureRandom: SecureRandom = SecureRandom.getInstance("SHA1PRNG")
@@ -35,44 +33,42 @@ class encryptTask extends Serializable{
     cipher.getIV ++ cipherTextWithoutIV
   }
 
-  def encryptFile(content: Array[Byte], secret: String): Array[Byte] = {
+  def encryptBytesWithFernet(content: Array[Byte], secret: String): Array[Byte] = {
       val key = new Key(secret)
-      println("## success key: " + key.serialise());
       val token: Token = Token.generate(key, content);
       token.serialise().getBytes
   }
 }
-object encrypt {
+object encryptFile {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains files' pwd to be encrypted
         val outputPath = args(1)
-        val secret = args(2)
+        val encryptMethod = args(2)
+        val secret = args(3)
         val sc = new SparkContext()
         val task = new encryptTask()
+        if (encryptMethod == "Java"){
+          val salt = args(4)
+          val output = sc.binaryFiles(inputPath)
+          .map{ case (name, bytesData) => {
+            val tmpOutputPath = outputPath + name.split("/").last
+            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
+            tmpOutputPath + " Java encrypt success!"
+          }}.map(println)
 
-        val output = sc.binaryFiles(inputPath)
-        .map{ case (name, bytesData) => { 
-          println("## success " + name)
-          Files.write(Paths.get(outputPath + name.split("/").last), task.encryptFile(bytesData.toArray, secret))
-          name + " encrypt success"
-        }}
-        output.map(println)
-        output.count()
-        // val bytesFile = Files.readAllBytes(Paths.get(inputPath))
+        }else if (encryptMethod == "Fernet"){
+          val output = sc.binaryFiles(inputPath)
+          .map{ case (name, bytesData) => {
+            val tmpOutputPath = outputPath + name.split("/").last
+            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithFernet(bytesData.toArray, secret))
+            tmpOutputPath + " Fernet encrypt success!"
+          }}.map(println)
+        }else{
+          println("Error! no such encrypt method!")
+        }
 
-        // final Key key = new Key("***key i got from python**");
-        // final Token token = Token.fromString("***cipher text i got from python***");
-        // val key: Key = Key.generateKey();
-        // val key = Key(secret)
-        // println("## success key: " + key.serialise());
-        // val token: Token = Token.generate(key, bytesFile);
-        // val encryptText = token.serialise()
-        // println("## success encrypt: " + encryptText)
-        // val decryptedText: String = token.validateAndDecrypt(key, validator)
-        // println("## success decrypt: " + decryptedText)
-        // Files.write(Paths.get(outputPath), encryptText.getBytes)
-
+        sc.stop()
     }
 }
 
