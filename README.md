@@ -5,7 +5,7 @@
 * Sbt
 
 ## Prepare
-* Files need to be decrypted. Put these files into a folder. These files should be encrypted either by AES/GCM use a secret and a salt or [Fernet](https://github.com/l0s/fernet-java8). I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
+* Files need to be decrypted. Put these files into a folder. These files should be encrypted either by [AES/GCM](https://github.com/intel-analytics/BigDL/blob/branch-2.0/scala/orca/src/main/scala/com/intel/analytics/bigdl/orca/inference/EncryptSupportive.scala#L140) use a secret and a salt or [Fernet](https://github.com/l0s/fernet-java8). I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
 
 * Build
 
@@ -17,7 +17,7 @@
 
 ## Run command
 ```
-spark-submit \
+$SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkDecryptFiles.decryptFiles \
   --jars /path/to/jars/fernet-java8-1.4.2.jar \
@@ -27,7 +27,7 @@ spark-submit \
 ```
 or
 ```
-spark-submit \
+$SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkDecryptFiles.decryptFiles \
   --jars /path/to/jars/fernet-java8-1.4.2.jar \
@@ -63,7 +63,7 @@ I use iris.csv and the output is:
 +------------+-----------+------------+-----------+------------+
 only showing top 20 rows
 ```
-You can fild the .csv files(Not encrypted) in `originData` folder.
+You can fild the .csv files(Not encrypted) in `./originData` folder.
 
 ## Usage
 * inputPath: String. A folder contains encrypt files.

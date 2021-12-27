@@ -5,7 +5,7 @@
 ## Run
 After [build](), run:
 ```
-spark-submit \
+$SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkEncryptFiles.encryptFiles \
   --jars /path/to/jars/fernet-java8-1.4.2.jar \
@@ -16,7 +16,7 @@ spark-submit \
 ```
 or
 ```
-spark-submit \
+$SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkEncryptFiles.encryptFiles \
   --jars /path/to/jars/fernet-java8-1.4.2.jar \
@@ -34,6 +34,8 @@ I use iris.csv and the output is:
 You can fild the .csv files(Encrypted) in `../originData` folder.
 
 If you doesn't have a Fernet key, you can use this [function]().
+
+Please modify the path in the command according to your needs.
 
 ## Usage
 * inputPath: String. A folder contains encrypt files.

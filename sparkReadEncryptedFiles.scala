@@ -15,7 +15,10 @@ import java.time.{Duration, Instant}
 import java.time.temporal.TemporalAmount
 
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
-
+/**
+ * @author diankun.an
+ *
+ */
 class decryptTask extends Serializable{
   
   def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {

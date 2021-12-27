@@ -9,7 +9,10 @@ import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
-
+/**
+ * @author diankun.an
+ *
+ */
 class encryptTask extends Serializable{
 
  def encryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
@@ -50,8 +53,8 @@ object encryptFiles {
         val sc = new SparkContext()
         val task = new encryptTask()
 
-        if(Files.exists(Paths.get(tmpOutputPath)) == false){
-          Files.createDirectory(Paths.get(tmpOutputPath))
+        if(Files.exists(Paths.get(outputPath)) == false){
+          Files.createDirectory(Paths.get(outputPath))
         }
         if (encryptMethod == "Java"){
           val salt = args(4)
