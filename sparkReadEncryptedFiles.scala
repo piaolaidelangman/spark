@@ -45,7 +45,7 @@ class decryptTask extends Serializable{
         return Duration.ofHours(24);
       }
     };
-    val key = new Key(secret)
+    val key = new Key(secret.getBytes)
     val token: Token = Token.fromString(new String(content));
     token.validateAndDecrypt(key, validator)
   }

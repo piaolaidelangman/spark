@@ -37,7 +37,7 @@ class encryptTask extends Serializable{
   }
 
   def encryptBytesWithFernet(content: Array[Byte], secret: String): Array[Byte] = {
-      val key = new Key(secret)
+      val key = new Key(secret.getBytes)
       val token: Token = Token.generate(key, content);
       token.serialise().getBytes
   }
