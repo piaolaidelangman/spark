@@ -3,7 +3,7 @@
 * Put files to be encrypted into a folder.
 
 ## Run
-After [build](), run:
+After [build](https://github.com/piaolaidelangman/spark-read-ecrypted-files#prepare), run:
 ```
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \

@@ -1,8 +1,8 @@
 # Spark Decrypt files
 ### This is a project to encrypt and decrypt files in spark with AES/GCM.
 ## Envirronment
-* Spark 3.x
-* Sbt
+* [Spark 3.x](https://spark.apache.org/downloads.html)
+* [Sbt](https://www.scala-sbt.org/1.x/docs/Setup.html)
 
 ## Prepare
 * Files need to be decrypted. Put these files into a folder. These files should be encrypted either by [AES/GCM](https://github.com/intel-analytics/BigDL/blob/branch-2.0/scala/orca/src/main/scala/com/intel/analytics/bigdl/orca/inference/EncryptSupportive.scala#L140) use a secret and a salt or [Fernet](https://github.com/l0s/fernet-java8). I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
@@ -13,7 +13,7 @@
   ```
   sbt package
   ```
-  You will get `./target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.ja`
+  You will get `./target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar`
 
 ## Run command
 ```
@@ -64,6 +64,8 @@ I use iris.csv and the output is:
 only showing top 20 rows
 ```
 You can fild the .csv files(Not encrypted) in `./originData` folder.
+
+Please modify the path in the command according to your needs.
 
 ## Usage
 * inputPath: String. A folder contains encrypt files.
