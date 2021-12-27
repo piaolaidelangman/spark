@@ -57,18 +57,18 @@ object encryptFiles {
           val salt = args(4)
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            val tmpOutputPath = outputPath + name.split("/").last
-            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
-            tmpOutputPath + " Java encrypt successfully saved!"
+            val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
+            Files.write(tmpOutputPath, task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
+            tmpOutputPath.toString + " Java encrypt successfully saved!"
           }}
           output.foreach(println)
 
         }else if (encryptMethod == "Fernet"){
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            val tmpOutputPath = outputPath + name.split("/").last
-            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithFernet(bytesData.toArray, secret))
-            tmpOutputPath + " Fernet encrypt successfully saved!"
+            val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
+            Files.write(tmpOutputPath, task.encryptBytesWithFernet(bytesData.toArray, secret))
+            tmpOutputPath.toString + " Fernet encrypt successfully saved!"
           }}
           output.foreach(println)
         }else{

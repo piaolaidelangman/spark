@@ -13,16 +13,27 @@
   ```
   sbt package
   ```
-  You will get `./target/scala-2.12/sparkDecrypt_2.12-0.1.jar`
+  You will get `./target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.ja`
 
 ## Run command
 ```
 spark-submit \
   --master local[2] \
   --class sparkDecryptFiles.decryptFiles \
-  -- jars /path/to/jars/fernet-java8-1.4.2.jar \
-  /path/to/target/scala-2.12/sparkDecrypt_2.12-0.1.jar \
-  /path/to/filesNeedsToBeDecrypt
+  --jars /path/to/jars/fernet-java8-1.4.2.jar \
+  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
+  /path/to/filesNeedsToBeDecrypt \
+  Java 1111111111 22222222222
+```
+or
+```
+spark-submit \
+  --master local[2] \
+  --class sparkDecryptFiles.decryptFiles \
+  --jars /path/to/jars/fernet-java8-1.4.2.jar \
+  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
+  /path/to/filesNeedsToBeDecrypt \
+  Fernet YLcuLTk2BXFCr2QLwvmERFlYCkmKyGLCnpUv9jevV8k=
 ```
 I use iris.csv and the output is:
 ```
@@ -62,7 +73,7 @@ You can fild the .csv files(Not encrypted) in `originData` folder.
 
 **Note:**
 
-I use fernet-java8's jar because even if I add library depencency in [build.sbt](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/build.sbt#L9), still got a error:
+I use fernet-java8's jar because even if I add library depencency in [build.sbt](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/build.sbt#L11), still got a error:
 ```
 java.lang.NoClassDefFoundError: com/macasaet/fernet/Key
 ```

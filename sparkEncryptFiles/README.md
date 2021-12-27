@@ -7,17 +7,33 @@ After [build](), run:
 ```
 spark-submit \
   --master local[2] \
-  --class sparkDecryptFiles.decryptFiles \
-  -- jars /path/to/jars/fernet-java8-1.4.2.jar \
-  /path/to/target/scala-2.12/sparkDecrypt_2.12-0.1.jar \
-  /path/to/filesNeedsToBeDecrypt
+  --class sparkEncryptFiles.encryptFiles \
+  --jars /path/to/jars/fernet-java8-1.4.2.jar \
+  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
+  /path/to/filesNeedsToBeEncrypt \
+  /path/to/filesEncrypted \
+  Java 1111111111 2222222222
 ```
-
+or
+```
+spark-submit \
+  --master local[2] \
+  --class sparkEncryptFiles.encryptFiles \
+  --jars /path/to/jars/fernet-java8-1.4.2.jar \
+  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
+  /path/to/filesNeedsToBeEncrypt \
+  /path/to/filesEncrypted \
+  Fernet YLcuLTk2BXFCr2QLwvmERFlYCkmKyGLCnpUv9jevV8k=
+```
 I use iris.csv and the output is:
 ```
+/tmp/encryptedFiles/iris_2.csv Java encrypt successfully saved!
+/tmp/encryptedFiles/iris_1.csv Java encrypt successfully saved!
 
 ```
-You can fild the .csv files(Encrypted) in `originData` folder.
+You can fild the .csv files(Encrypted) in `../originData` folder.
+
+If you doesn't have a Fernet key, you can use this [function]().
 
 ## Usage
 * inputPath: String. A folder contains encrypt files.
