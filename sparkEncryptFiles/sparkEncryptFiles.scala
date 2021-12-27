@@ -1,4 +1,4 @@
-package piaolaidelangman.spark
+package sparkEncryptFiles
 
 import org.apache.spark.SparkContext
 
@@ -9,7 +9,10 @@ import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
-
+/**
+ * @author diankun.an
+ *
+ */
 class encryptTask extends Serializable{
 
  def encryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
@@ -39,7 +42,7 @@ class encryptTask extends Serializable{
       token.serialise().getBytes
   }
 }
-object encryptFile {
+object encryptFiles {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains files' pwd to be encrypted
@@ -50,22 +53,25 @@ object encryptFile {
         val sc = new SparkContext()
         val task = new encryptTask()
 
+        if(Files.exists(Paths.get(outputPath)) == false){
+          Files.createDirectory(Paths.get(outputPath))
+        }
         if (encryptMethod == "Java"){
           val salt = args(4)
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            val tmpOutputPath = outputPath + name.split("/").last
-            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
-            tmpOutputPath + " Java encrypt successfully saved!"
+            val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
+            Files.write(tmpOutputPath, task.encryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
+            tmpOutputPath.toString + " Java encrypt successfully saved!"
           }}
           output.foreach(println)
 
         }else if (encryptMethod == "Fernet"){
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            val tmpOutputPath = outputPath + name.split("/").last
-            Files.write(Paths.get(tmpOutputPath), task.encryptBytesWithFernet(bytesData.toArray, secret))
-            tmpOutputPath + " Fernet encrypt successfully saved!"
+            val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
+            Files.write(tmpOutputPath, task.encryptBytesWithFernet(bytesData.toArray, secret))
+            tmpOutputPath.toString + " Fernet encrypt successfully saved!"
           }}
           output.foreach(println)
         }else{

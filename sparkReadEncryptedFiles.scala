@@ -1,22 +1,24 @@
-package piaolaidelangman.spark
+package sparkDecryptFiles
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
 
-import java.nio.file.{Files, Paths}
 import java.util.Base64
+import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
-import java.time.Duration;
-import java.time.Instant;
+import java.time.{Duration, Instant}
 import java.time.temporal.TemporalAmount
 
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
-
+/**
+ * @author diankun.an
+ *
+ */
 class decryptTask extends Serializable{
   
   def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
@@ -48,25 +50,25 @@ class decryptTask extends Serializable{
     token.validateAndDecrypt(key, validator)
   }
 }
-object decryptFile {
+object decryptFiles {
 
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains encrypted files' pwd
-        val encryptMethod = args(1)
+        val decryptMethod = args(1)
         val secret = args(2)
 
         val sc = new SparkContext()
         val task: decryptTask = new decryptTask()
         var decryption = sc.emptyRDD[String]
         
-        if (encryptMethod == "Java"){
+        if (decryptMethod == "Java"){
           val salt = args(3)
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
           }}.cache()
-        }else if (encryptMethod == "Fernet"){
+        }else if (decryptMethod == "Fernet"){
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             task.decryptBytesWithFernet(bytesData.toArray, secret)
