@@ -1,28 +1,30 @@
 # Spark Decrypt files
+### This is a project to encrypt and decrypt files in spark with AES/GCM.
 ## Envirronment
-* Spark 3.1.2
+* Spark 3.x
 * Sbt
 
-## Data Prepare
-* Encrypted files. Put the pwd of binary encrypted files into a `input.txt` file 
+## Prepare
+* Files need to be decrypted. Put these files into a folder. These files should be encrypted either by AES/GCM use a secret and a salt or [Fernet](https://github.com/l0s/fernet-java8). I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
 
-* Package
+* Build
 
-run:
-```
-sbt package
-```
-You will get `./target/scala-2.12/spark_2.12-0.1.jar`
+  run:
+  ```
+  sbt package
+  ```
+  You will get `./target/scala-2.12/sparkDecrypt_2.12-0.1.jar`
 
 ## Run command
 ```
 spark-submit \
   --master local[2] \
-  --class piaolaidelangman.spark.decrypt \
-  /path/to/target/scala-2.12/spark_2.12-0.1.jar \
-  /path/to/input.txt
+  --class sparkDecryptFiles.decryptFiles \
+  -- jars /path/to/jars/fernet-java8-1.4.2.jar \
+  /path/to/target/scala-2.12/sparkDecrypt_2.12-0.1.jar \
+  /path/to/filesNeedsToBeDecrypt
 ```
-I use iris.cvs and the output is:
+I use iris.csv and the output is:
 ```
 +------------+-----------+------------+-----------+------------+
 |sepal length|sepal width|petal length|petal width|       class|
@@ -50,12 +52,18 @@ I use iris.cvs and the output is:
 +------------+-----------+------------+-----------+------------+
 only showing top 20 rows
 ```
+You can fild the .csv files(Not encrypted) in `originData` folder.
 
-## Parameter
-**Decrypt method and Key:**
+## Usage
+* inputPath: String. A folder contains encrypt files.
+* encryptMethod: String. "Java" or "Fernet". A method used to decrypt files according your encrypt method.
+* secret: String. Java decrypt method AES/GCM needs parameters 'secret' and 'salt'. In Fernet, 'secret' is a key.
+* salt: String. As mentioned above. Decrypt method 'Fernet' doesn't need this parameter.
 
-In `sparkReadEncryptedFiles.scala` class `decryptTask`, change these code according to your need.
+**Note:**
 
-**Schema:**
-In `sparkReadEncryptedFiles.scala` [line 58](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkReadEncryptedFiles.scala#L58), change schema according to your need.
-
+I use fernet-java8's jar because even if I add library depencency in [build.sbt](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/build.sbt#L9), still got a error:
+```
+java.lang.NoClassDefFoundError: com/macasaet/fernet/Key
+```
+And I haven't find the reason.

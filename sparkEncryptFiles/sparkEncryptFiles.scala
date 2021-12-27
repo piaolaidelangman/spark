@@ -1,4 +1,4 @@
-package piaolaidelangman.spark
+package sparkEncryptFiles
 
 import org.apache.spark.SparkContext
 
@@ -39,7 +39,7 @@ class encryptTask extends Serializable{
       token.serialise().getBytes
   }
 }
-object encryptFile {
+object encryptFiles {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains files' pwd to be encrypted
@@ -50,6 +50,9 @@ object encryptFile {
         val sc = new SparkContext()
         val task = new encryptTask()
 
+        if(Files.exists(Paths.get(tmpOutputPath)) == false){
+          Files.createDirectory(Paths.get(tmpOutputPath))
+        }
         if (encryptMethod == "Java"){
           val salt = args(4)
           val output = sc.binaryFiles(inputPath)

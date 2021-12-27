@@ -1,4 +1,4 @@
-name := "spark"
+name := "sparkDecrypt"
 
 version := "0.1"
 
