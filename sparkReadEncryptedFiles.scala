@@ -71,7 +71,10 @@ object decryptFiles {
         }else if (decryptMethod == "Fernet"){
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            task.decryptBytesWithFernet(bytesData.toArray, secret)
+            val decoder = Base64.getDecoder()
+            val encoder = Base64.getEncoder()
+            val key = decoder.decode((encoder.encodeToString(secret.getBytes))
+            task.decryptBytesWithFernet(bytesData.toArray, key)
           }}.cache()
         }else{
           println("Error! no such decrypt method!")
