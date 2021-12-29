@@ -39,13 +39,13 @@ class decryptTask extends Serializable{
     cipher.doFinal(cipherTextWithoutIV)
   }
 
-  def decryptBytesWithFernet(content: Array[Byte], secret: String): String = {
+  def decryptBytesWithFernet(content: Array[Byte], secret: Array[Byte]): String = {
     val validator = new StringValidator() {
       override def  getTimeToLive() : TemporalAmount = {
         return Duration.ofHours(24);
       }
     };
-    val key = new Key(secret.getBytes)
+    val key = new Key(secret)
     val token: Token = Token.fromString(new String(content));
     token.validateAndDecrypt(key, validator)
   }
@@ -69,9 +69,12 @@ object decryptFiles {
             new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
           }}.cache()
         }else if (decryptMethod == "Fernet"){
+          val decoder = Base64.getDecoder()
+          val encoder = Base64.getEncoder()
+          val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            task.decryptBytesWithFernet(bytesData.toArray, secret)
+            task.decryptBytesWithFernet(bytesData.toArray, key)
           }}.cache()
         }else{
           println("Error! no such decrypt method!")
