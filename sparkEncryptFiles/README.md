@@ -4,7 +4,7 @@
 
 ## Run
 After [build](https://github.com/piaolaidelangman/spark-read-ecrypted-files#prepare), run:
-```
+```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkEncryptFiles.encryptFiles \
@@ -15,7 +15,7 @@ $SPARK_HOME/bin/spark-submit \
   Java 1111111111 2222222222
 ```
 or
-```
+```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkEncryptFiles.encryptFiles \
@@ -26,7 +26,7 @@ $SPARK_HOME/bin/spark-submit \
   Fernet YLcuLTk2BXFCr2QLwvmERFlYCkmKyGLCnpUv9jevV8k=
 ```
 I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/sparkEncryptFiles/originData) and the output is:
-```
+```bash
 /tmp/encryptedFiles/iris_2.csv Java encrypt successfully saved!
 /tmp/encryptedFiles/iris_1.csv Java encrypt successfully saved!
 

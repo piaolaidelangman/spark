@@ -11,7 +11,6 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 /**
  * @author diankun.an
- *
  */
 class encryptTask extends Serializable{
 

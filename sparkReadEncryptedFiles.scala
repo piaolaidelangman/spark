@@ -17,7 +17,6 @@ import java.time.temporal.TemporalAmount
 import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 /**
  * @author diankun.an
- *
  */
 class decryptTask extends Serializable{
   
@@ -42,7 +41,7 @@ class decryptTask extends Serializable{
   def decryptBytesWithFernet(content: Array[Byte], secret: Array[Byte]): String = {
     val validator = new StringValidator() {
       override def  getTimeToLive() : TemporalAmount = {
-        return Duration.ofHours(24);
+        return Duration.ofHours(24)  // If Token is expired, enlarge this number.
       }
     };
     val key = new Key(secret)
@@ -55,7 +54,7 @@ object decryptFiles {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains encrypted files' pwd
-        val decryptMethod = args(1)
+        val decryptMethod = args(1) // Java or Fernet
         val secret = args(2)
 
         val sc = new SparkContext()
@@ -80,9 +79,11 @@ object decryptFiles {
           println("Error! no such decrypt method!")
         }
 
+        // RDD to DataFrame
         val spark = SparkSession.builder().getOrCreate()
         import spark.implicits._
 
+        // iris.csv's schema, change this according to your data.
         val schema = new StructType(Array(
         StructField("sepal length", DoubleType, false),
         StructField("sepal width", DoubleType, false),
@@ -90,7 +91,7 @@ object decryptFiles {
         StructField("petal width", DoubleType, false),
         StructField("class", StringType, false)))
 
-        //split a file into rows
+        // split a file(string) into rows
         val rowRDD = decryption
         .flatMap(_.split("\n"))
         .map(_.split(","))
