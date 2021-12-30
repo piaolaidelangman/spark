@@ -6,7 +6,6 @@ import java.util.Base64
 import java.util.Arrays.copyOfRange
 import java.time.Instant
 import java.io.{ByteArrayOutputStream, DataOutputStream}
-import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory, Mac}
@@ -40,7 +39,7 @@ class encryptTask extends Serializable{
 
   def encryptBytesWithJavaAESCBC(content: Array[Byte], secret: Array[Byte]): Array[Byte] = {
     val encoder = Base64.getUrlEncoder()
-    val bytes = (new String(content)).getBytes(UTF_8)
+    // val bytes = (new String(content)).getBytes(UTF_8)
 
     //  get IV
     val random = new SecureRandom()
@@ -56,7 +55,7 @@ class encryptTask extends Serializable{
     val cipher: Cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, encryptionKeySpec, ivParameterSpec)
 
-    val cipherText: Array[Byte] = cipher.doFinal(bytes)
+    val cipherText: Array[Byte] = cipher.doFinal(content)
     val timestamp: Instant = Instant.now()
 
     // sign
@@ -68,7 +67,6 @@ class encryptTask extends Serializable{
     dataStream.writeLong(timestamp.getEpochSecond())
     dataStream.write(ivParameterSpec.getIV())
     dataStream.write(cipherText)
-
 
     val mac: Mac = Mac.getInstance("HmacSHA256")
     val signingKeySpec = new SecretKeySpec(signingKey, "HmacSHA256")
@@ -97,7 +95,7 @@ class encryptTask extends Serializable{
         throw new cryptoException("hmac must be 256 bits")
     }
 
-    val resultString = new String(encoder.encodeToString(outByteStream.toByteArray()).getBytes, UTF_8)
+    val resultString = new String(encoder.encodeToString(outByteStream.toByteArray()))
     resultString.getBytes
   }
 }
