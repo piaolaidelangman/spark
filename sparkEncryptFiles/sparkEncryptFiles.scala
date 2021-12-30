@@ -126,10 +126,13 @@ object encryptFiles {
           output.foreach(println)
 
         }else if (encryptMethod == "AESCBC"){
+          val decoder = Base64.getDecoder()
+          val encoder = Base64.getEncoder()
+          val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
           val output = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
-            Files.write(tmpOutputPath, task.encryptBytesWithJavaAESCBC(bytesData.toArray, secret))
+            Files.write(tmpOutputPath, task.encryptBytesWithJavaAESCBC(bytesData.toArray, key))
             tmpOutputPath.toString + " AES/CBC encrypt successfully saved!"
           }}
           output.foreach(println)
