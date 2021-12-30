@@ -16,7 +16,6 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
 import java.time.{Duration, Instant}
 import java.time.temporal.TemporalAmount
 
-import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 /**
  * @author diankun.an
  */
