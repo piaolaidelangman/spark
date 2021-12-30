@@ -2,10 +2,14 @@ package sparkCryptoFiles
 
 import org.apache.spark.SparkContext
 
-import java.nio.file.{Files, Paths}
 import java.util.Base64
+import java.util.Arrays.copyOfRange
+import java.time.Instant
+import java.io.{ByteArrayOutputStream, DataOutputStream}
+import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
-import javax.crypto.{Cipher, SecretKeyFactory}
+import javax.crypto.{Cipher, SecretKeyFactory, Mac}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
 /**

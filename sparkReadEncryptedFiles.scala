@@ -6,7 +6,9 @@ import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
 
 import java.util.Base64
+import java.util.Arrays.copyOfRange
 import java.nio.file.{Files, Paths}
+import java.io.{ByteArrayInputStream, DataInputStream}
 import java.security.SecureRandom
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
