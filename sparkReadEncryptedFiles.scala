@@ -1,4 +1,4 @@
-package sparkDecryptFiles
+package sparkCryptoFiles
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -38,15 +38,43 @@ class decryptTask extends Serializable{
     cipher.doFinal(cipherTextWithoutIV)
   }
 
-  def decryptBytesWithFernet(content: Array[Byte], secret: Array[Byte]): String = {
-    val validator = new StringValidator() {
-      override def  getTimeToLive() : TemporalAmount = {
-        return Duration.ofHours(24)  // If Token is expired, enlarge this number.
-      }
-    };
-    val key = new Key(secret)
-    val token: Token = Token.fromString(new String(content));
-    token.validateAndDecrypt(key, validator)
+  def decryptBytesWithJavaAESCBC(content: Array[Byte], secret: Array[Byte]): String = {
+    val decoder = Base64.getUrlDecoder()
+    // val decoder = Base64.getMimeDecoder()
+    // val encoder = Base64.getUrlEncoder()
+    val bytes = decoder.decode(new String(content))
+    // val bytes = content
+    val inputStream: ByteArrayInputStream = new ByteArrayInputStream(bytes)
+    val dataStream: DataInputStream = new DataInputStream(inputStream)
+
+    val version: Byte = dataStream.readByte()
+    if(version.compare((0x80).toByte) != 0){
+      throw new cryptoException("Version error!")
+    }
+    val encryptKey: Array[Byte] = copyOfRange(secret, 16, 32)
+
+    val timestampSeconds: Long = dataStream.readLong()
+
+    val initializationVector: Array[Byte] = read(dataStream, 16)
+    val ivParameterSpec = new IvParameterSpec(initializationVector)
+
+    val cipherText: Array[Byte] = read(dataStream, bytes.length - 57)
+
+    val hmac: Array[Byte] = read(dataStream, 32)
+
+    val secretKeySpec = new SecretKeySpec(encryptKey, "AES")
+    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
+
+    new String(cipher.doFinal(cipherText))
+  }
+  def read(stream: DataInputStream, numBytes: Int): Array[Byte]={
+    val retval = new Array[Byte](numBytes)
+    val bytesRead: Int = stream.read(retval)
+    if (bytesRead < numBytes) {
+      throw new cryptoException("Not enough bits to generate a Token")
+    }
+    retval
   }
 }
 object decryptFiles {
@@ -61,19 +89,19 @@ object decryptFiles {
         val task: decryptTask = new decryptTask()
         var decryption = sc.emptyRDD[String]
         
-        if (decryptMethod == "Java"){
+        if (decryptMethod == "AESGCM"){
           val salt = args(3)
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
           }}.cache()
-        }else if (decryptMethod == "Fernet"){
+        }else if (decryptMethod == "AESCBC"){
           val decoder = Base64.getDecoder()
           val encoder = Base64.getEncoder()
           val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            task.decryptBytesWithFernet(bytesData.toArray, key)
+            task.decryptBytesWithJavaAESCBC(bytesData.toArray, key)
           }}.cache()
         }else{
           println("Error! no such decrypt method!")

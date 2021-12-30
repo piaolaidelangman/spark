@@ -8,7 +8,6 @@ Compile / unmanagedSourceDirectories += baseDirectory.value / "sparkEncryptFiles
 lazy val commonSettings = Seq(
   libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.1.2",
   libraryDependencies += "org.apache.spark" %% "spark-mllib" % "3.1.2",
-  libraryDependencies += "com.macasaet.fernet" % "fernet-java8" % "1.4.2"
   )
 
 lazy val root = (project in file("."))
