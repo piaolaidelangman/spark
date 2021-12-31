@@ -1,3 +1,5 @@
+package sparkCryptoFiles
+
 import java.util.Base64
 import java.util.Arrays.copyOfRange
 import java.io.{ByteArrayInputStream, DataInputStream}
@@ -62,7 +64,7 @@ class decryptTask extends Serializable{
 
     new String(cipher.doFinal(cipherText))
   }
-  
+
   def read(stream: DataInputStream, numBytes: Int): Array[Byte]={
     val retval = new Array[Byte](numBytes)
     val bytesRead: Int = stream.read(retval)

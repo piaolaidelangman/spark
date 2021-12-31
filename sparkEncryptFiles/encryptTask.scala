@@ -1,3 +1,5 @@
+package sparkCryptoFiles
+
 import java.util.Base64
 import java.util.Arrays.copyOfRange
 import java.time.Instant
@@ -87,5 +89,5 @@ class encryptTask extends Serializable{
     val resultString = new String(encoder.encodeToString(outByteStream.toByteArray()))
     resultString.getBytes
   }
-  
+
 }
