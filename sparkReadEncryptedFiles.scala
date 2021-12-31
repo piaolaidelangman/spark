@@ -6,87 +6,12 @@ import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
 
 import java.util.Base64
-import java.util.Arrays.copyOfRange
 import java.nio.file.{Files, Paths}
-import java.io.{ByteArrayInputStream, DataInputStream}
-import java.security.SecureRandom
-import javax.crypto.{Cipher, SecretKeyFactory}
-import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
-
-import java.time.{Duration, Instant}
-import java.time.temporal.TemporalAmount
 
 /**
  * @author diankun.an
  */
-class decryptTask extends Serializable{
-  
-  def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
-      new String(decryptBytesWithJavaAESGCM(Base64.getDecoder.decode(content), secret, salt, keyLen))
-  }
 
-  def decryptBytesWithJavaAESGCM(content: Array[Byte], secret: String, salt: String, keyLen: Int = 128): Array[Byte] = {
-    val cipherTextWithIV = content
-    val iv = cipherTextWithIV.slice(0, 12)
-    val gcmParameterSpec = new GCMParameterSpec(128, iv)
-    val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-    val spec = new PBEKeySpec(secret.toCharArray, salt.getBytes(), 65536, keyLen)
-    val tmp = secretKeyFactory.generateSecret(spec)
-    val secretKeySpec = new SecretKeySpec(tmp.getEncoded, "AES")
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcmParameterSpec)
-    val cipherTextWithoutIV = cipherTextWithIV.slice(12, cipherTextWithIV.length)
-    cipher.doFinal(cipherTextWithoutIV)
-  }
-
-  def decryptBytesWithJavaAESCBC(content: Array[Byte], secret: Array[Byte]): String = {
-    val decoder = Base64.getUrlDecoder()
-    // val decoder = Base64.getMimeDecoder()
-    // val encoder = Base64.getUrlEncoder()
-    val bytes = decoder.decode(new String(content))
-    // val bytes = content
-    val inputStream: ByteArrayInputStream = new ByteArrayInputStream(bytes)
-    val dataStream: DataInputStream = new DataInputStream(inputStream)
-
-    val version: Byte = dataStream.readByte()
-    if(version.compare((0x80).toByte) != 0){
-      throw new cryptoException("Version error!")
-    }
-    val encryptKey: Array[Byte] = copyOfRange(secret, 16, 32)
-
-    val timestampSeconds: Long = dataStream.readLong()
-
-    val initializationVector: Array[Byte] = read(dataStream, 16)
-    val ivParameterSpec = new IvParameterSpec(initializationVector)
-
-    val cipherText: Array[Byte] = read(dataStream, bytes.length - 57)
-
-    val hmac: Array[Byte] = read(dataStream, 32)
-    if(initializationVector.length != 16)
-      throw new cryptoException("Initialization Vector must be 128 bits")
-    }
-    if (cipherText == null || cipherText.length % 16 != 0) {
-        throw new cryptoException("Ciphertext must be a multiple of 128 bits")
-    }
-    if (hmac == null || hmac.length != 32) {
-        throw new cryptoException("hmac must be 256 bits")
-    }
-
-    val secretKeySpec = new SecretKeySpec(encryptKey, "AES")
-    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
-
-    new String(cipher.doFinal(cipherText))
-  }
-  def read(stream: DataInputStream, numBytes: Int): Array[Byte]={
-    val retval = new Array[Byte](numBytes)
-    val bytesRead: Int = stream.read(retval)
-    if (bytesRead < numBytes) {
-      throw new cryptoException("Not enough bits to read!")
-    }
-    retval
-  }
-}
 object decryptFiles {
 
     def main(args: Array[String]): Unit = {
@@ -94,21 +19,20 @@ object decryptFiles {
         val inputPath = args(0) // path to a txt which contains encrypted files' pwd
         val decryptMethod = args(1) // AESGCM or AESCBC
         val secret = args(2)
+        val decoder = Base64.getDecoder()
+        val encoder = Base64.getEncoder()
+        val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
 
         val sc = new SparkContext()
         val task: decryptTask = new decryptTask()
         var decryption = sc.emptyRDD[String]
         
         if (decryptMethod == "AESGCM"){
-          val salt = args(3)
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
+            new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, key))
           }}.cache()
         }else if (decryptMethod == "AESCBC"){
-          val decoder = Base64.getDecoder()
-          val encoder = Base64.getEncoder()
-          val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
             task.decryptBytesWithJavaAESCBC(bytesData.toArray, key)
