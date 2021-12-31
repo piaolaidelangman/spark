@@ -62,6 +62,15 @@ class decryptTask extends Serializable{
     val cipherText: Array[Byte] = read(dataStream, bytes.length - 57)
 
     val hmac: Array[Byte] = read(dataStream, 32)
+    if(initializationVector.length != 16)
+      throw new cryptoException("Initialization Vector must be 128 bits")
+    }
+    if (cipherText == null || cipherText.length % 16 != 0) {
+        throw new cryptoException("Ciphertext must be a multiple of 128 bits")
+    }
+    if (hmac == null || hmac.length != 32) {
+        throw new cryptoException("hmac must be 256 bits")
+    }
 
     val secretKeySpec = new SecretKeySpec(encryptKey, "AES")
     val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
@@ -73,7 +82,7 @@ class decryptTask extends Serializable{
     val retval = new Array[Byte](numBytes)
     val bytesRead: Int = stream.read(retval)
     if (bytesRead < numBytes) {
-      throw new cryptoException("Not enough bits to generate a Token")
+      throw new cryptoException("Not enough bits to read!")
     }
     retval
   }
@@ -83,7 +92,7 @@ object decryptFiles {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains encrypted files' pwd
-        val decryptMethod = args(1) // Java or Fernet
+        val decryptMethod = args(1) // AESGCM or AESCBC
         val secret = args(2)
 
         val sc = new SparkContext()
