@@ -13,12 +13,12 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
  */
 class encryptTask extends Serializable{
 
-  def encryptBytesWithJavaAESGCM(content: Array[Byte], key:Array[Byte], keyLen: Int = 128): Array[Byte] = {
+  def encryptBytesWithJavaAESGCM(content: Array[Byte], key: Array[Byte]): Array[Byte] = {
 
-    val iv = new Array[Byte](16)
+    val initializationVector = new Array[Byte](16)
     val secureRandom: SecureRandom = new SecureRandom()
-    secureRandom.nextBytes(iv)
-    val gcmParameterSpec = new GCMParameterSpec(128, iv)
+    secureRandom.nextBytes(initializationVector)
+    val gcmParameterSpec = new GCMParameterSpec(128, initializationVector)
 
     val secretKeySpec = new SecretKeySpec(key, "AES")
 
@@ -30,7 +30,6 @@ class encryptTask extends Serializable{
 
   def encryptBytesWithJavaAESCBC(content: Array[Byte], secret: Array[Byte]): Array[Byte] = {
     val encoder = Base64.getUrlEncoder()
-    // val bytes = (new String(content)).getBytes(UTF_8)
 
     //  get IV
     val random = new SecureRandom()
@@ -74,7 +73,7 @@ class encryptTask extends Serializable{
     dataOutStream.write(hmac)
 
     if (timestamp == null) {
-        throw new cryptoException("timestamp cannot be null")
+        throw new cryptoException("Timestamp cannot be null")
     }
     if (ivParameterSpec == null || ivParameterSpec.getIV().length != 16) {
         throw new cryptoException("Initialization Vector must be 128 bits")
@@ -83,7 +82,7 @@ class encryptTask extends Serializable{
         throw new cryptoException("Ciphertext must be a multiple of 128 bits")
     }
     if (hmac == null || hmac.length != 32) {
-        throw new cryptoException("hmac must be 256 bits")
+        throw new cryptoException("Hmac must be 256 bits")
     }
 
     val resultString = new String(encoder.encodeToString(outByteStream.toByteArray()))

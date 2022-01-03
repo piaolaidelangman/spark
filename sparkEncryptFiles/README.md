@@ -1,6 +1,7 @@
 # Spark Encrypt files
 ## Data Prepare
 * Put files to be encrypted into a folder.
+* Prepare a secret-key or [generate]().
 
 ## Run
 After [build](https://github.com/piaolaidelangman/spark-read-ecrypted-files#prepare), run:
@@ -29,9 +30,7 @@ I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/t
 /tmp/AESGCM/iris_2.csv AES/GCM encrypt successfully saved!
 /tmp/AESGCM/iris_1.csv AES/GCM encrypt successfully saved!
 ```
-You can fild the .csv files(To be encrypted) in `./originData` folder.
-
-If you doesn't have a **key**, you can use this [function]().
+Then I get the `iris.csv`(Encrypted) in folder `/tmp/AESGCM`.
 
 Please modify the path in the command according to your needs.
 
