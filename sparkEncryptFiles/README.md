@@ -34,6 +34,19 @@ Then I get the `iris.csv`(Encrypted) in folder `/tmp/AESGCM`.
 
 Please modify the path in the command according to your needs.
 
+If you donot have a secret-key, you can generate one use:
+```bash
+$SPARK_HOME/bin/spark-submit \
+  --master local[2] \
+  --class sparkCryptoFiles.testKey \
+  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar
+```
+The output is:
+```js
+Successfully generate key:
+ft5eLMNQpJul8MEpNFHa+UwLzVOo+KlsWrCEGZvhpKM=
+```
+
 ## Usage
 * inputPath: String. A folder contains encrypt files.
 * outputPath: String. The path where encrypted files to be saved.

@@ -13,6 +13,10 @@
   ```bash
   sbt package
   ```
+  The output is:
+  ```js
+  [success] Total time: 12 s, completed Jan 3, 2022 10:41:01 AM
+  ```
   You will get `./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar`
 
 ## Run command
@@ -34,7 +38,7 @@ $SPARK_HOME/bin/spark-submit \
   AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
 I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/sparkEncryptFiles/originData) and the output is:
-```bash
+```js
 +------------+-----------+------------+-----------+------------+
 |sepal length|sepal width|petal length|petal width|       class|
 +------------+-----------+------------+-----------+------------+
