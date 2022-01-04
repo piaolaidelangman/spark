@@ -1,11 +1,11 @@
 # Spark Decrypt files
-### This is a project to encrypt and decrypt files in spark with AES/GCM.
+### This is a project to encrypt and decrypt files in spark with AES/GCM or AES/CBC.
 ## Envirronment
 * [Spark 3.x](https://spark.apache.org/downloads.html)
 * [Sbt](https://www.scala-sbt.org/1.x/docs/Setup.html)
 
 ## Prepare
-* Files need to be decrypted. Put these files into a folder. These files should be encrypted either by [AES/GCM](https://github.com/intel-analytics/BigDL/blob/branch-2.0/scala/orca/src/main/scala/com/intel/analytics/bigdl/orca/inference/EncryptSupportive.scala#L140) use a secret and a salt or [Fernet](https://github.com/l0s/fernet-java8). I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
+* Files need to be decrypted. Put these files into a folder. These files should be encrypted either by [AES/GCM]() or [AES/CBC]() use a key. I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
 
 * Build
 
@@ -13,30 +13,32 @@
   ```bash
   sbt package
   ```
-  You will get `./target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar`
+  The output is:
+  ```js
+  [success] Total time: 12 s, completed Jan 3, 2022 10:41:01 AM
+  ```
+  You will get `./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar`
 
 ## Run command
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
-  --class sparkDecryptFiles.decryptFiles \
-  --jars /path/to/jars/fernet-java8-1.4.2.jar \
-  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
-  /path/to/filesNeedsToBeDecrypt \
-  Java 1111111111 22222222222
+  --class sparkCryptoFiles.decryptFiles \
+  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
+  /tmp/AESCBC \
+  AESCBC LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
 or
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
-  --class sparkDecryptFiles.decryptFiles \
-  --jars /path/to/jars/fernet-java8-1.4.2.jar \
-  /path/to/target/scala-2.12/sparkdecryptfiles_2.12-0.1.0.jar \
-  /path/to/filesNeedsToBeDecrypt \
-  Fernet YLcuLTk2BXFCr2QLwvmERFlYCkmKyGLCnpUv9jevV8k=
+  --class sparkCryptoFiles.decryptFiles \
+  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
+  /tmp/AESGCM \
+  AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
 I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/sparkEncryptFiles/originData) and the output is:
-```bash
+```js
 +------------+-----------+------------+-----------+------------+
 |sepal length|sepal width|petal length|petal width|       class|
 +------------+-----------+------------+-----------+------------+
@@ -69,14 +71,5 @@ Please modify the path in the command according to your needs.
 
 ## Usage
 * inputPath: String. A folder contains encrypt files.
-* encryptMethod: String. "Java" or "Fernet". A method used to decrypt files according your encrypt method.
-* secret: String. Java decrypt method AES/GCM needs parameters 'secret' and 'salt'. In Fernet, 'secret' is a key.
-* salt: String. As mentioned above. Decrypt method 'Fernet' doesn't need this parameter.
-
-**Note:**
-
-I use fernet-java8's jar because even if I add library depencency in [build.sbt](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/build.sbt#L11), still got a error:
-```
-java.lang.NoClassDefFoundError: com/macasaet/fernet/Key
-```
-And I haven't find the reason.
+* decryptMethod: String. "AESCBC" or "AESGCM". A method used to decrypt files according your encrypt method.
+* secret: String. "AESCBC" or "AESGCM" decrypt method needs this parameter.

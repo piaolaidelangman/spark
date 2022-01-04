@@ -1,4 +1,4 @@
-package sparkDecryptFiles
+package sparkCryptoFiles
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -7,73 +7,35 @@ import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructTy
 
 import java.util.Base64
 import java.nio.file.{Files, Paths}
-import java.security.SecureRandom
-import javax.crypto.{Cipher, SecretKeyFactory}
-import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 
-import java.time.{Duration, Instant}
-import java.time.temporal.TemporalAmount
-
-import com.macasaet.fernet.{Key, Validator, StringValidator, Token}
 /**
  * @author diankun.an
  */
-class decryptTask extends Serializable{
-  
-  def decryptWithJavaAESGCM(content: String, secret: String, salt: String, keyLen: Int = 128): String = {
-      new String(decryptBytesWithJavaAESGCM(Base64.getDecoder.decode(content), secret, salt, keyLen))
-  }
 
-  def decryptBytesWithJavaAESGCM(content: Array[Byte], secret: String, salt: String, keyLen: Int = 128): Array[Byte] = {
-    val cipherTextWithIV = content
-    val iv = cipherTextWithIV.slice(0, 12)
-    val gcmParameterSpec = new GCMParameterSpec(128, iv)
-    val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-    val spec = new PBEKeySpec(secret.toCharArray, salt.getBytes(), 65536, keyLen)
-    val tmp = secretKeyFactory.generateSecret(spec)
-    val secretKeySpec = new SecretKeySpec(tmp.getEncoded, "AES")
-    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcmParameterSpec)
-    val cipherTextWithoutIV = cipherTextWithIV.slice(12, cipherTextWithIV.length)
-    cipher.doFinal(cipherTextWithoutIV)
-  }
-
-  def decryptBytesWithFernet(content: Array[Byte], secret: Array[Byte]): String = {
-    val validator = new StringValidator() {
-      override def  getTimeToLive() : TemporalAmount = {
-        return Duration.ofHours(24)  // If Token is expired, enlarge this number.
-      }
-    };
-    val key = new Key(secret)
-    val token: Token = Token.fromString(new String(content));
-    token.validateAndDecrypt(key, validator)
-  }
-}
 object decryptFiles {
 
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0) // path to a txt which contains encrypted files' pwd
-        val decryptMethod = args(1) // Java or Fernet
+        val decryptMethod = args(1) // AESGCM or AESCBC
         val secret = args(2)
+        val decoder = Base64.getDecoder()
+        val encoder = Base64.getEncoder()
+        val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
 
         val sc = new SparkContext()
         val task: decryptTask = new decryptTask()
         var decryption = sc.emptyRDD[String]
         
-        if (decryptMethod == "Java"){
-          val salt = args(3)
+        if (decryptMethod == "AESGCM"){
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, secret, salt))
+            new String(task.decryptBytesWithJavaAESGCM(bytesData.toArray, key))
           }}.cache()
-        }else if (decryptMethod == "Fernet"){
-          val decoder = Base64.getDecoder()
-          val encoder = Base64.getEncoder()
-          val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
+        }else if (decryptMethod == "AESCBC"){
           decryption = sc.binaryFiles(inputPath)
           .map{ case (name, bytesData) => {
-            task.decryptBytesWithFernet(bytesData.toArray, key)
+            task.decryptBytesWithJavaAESCBC(bytesData.toArray, key)
           }}.cache()
         }else{
           println("Error! no such decrypt method!")
