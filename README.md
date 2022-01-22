@@ -1,5 +1,5 @@
 # Spark Decrypt files
-### This is a project to encrypt and decrypt files in spark with AES/GCM or AES/CBC.
+### This is a project to encrypt and decrypt files in spark with AES/GCM or AES/CBC only use java and spark dependencies.
 ## Environment
 * [Spark 3.x](https://spark.apache.org/downloads.html)
 * [Maven](https://maven.apache.org/)
