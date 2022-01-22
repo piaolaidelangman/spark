@@ -23,6 +23,7 @@ object decryptColumn {
     def main(args: Array[String]): Unit = {
 
         val inputPath = args(0)
+        val secret = args(1)
         val decoder = Base64.getDecoder()
         val encoder = Base64.getEncoder()
         val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
