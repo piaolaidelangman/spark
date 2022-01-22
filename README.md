@@ -11,7 +11,7 @@
 
   run:
   ```bash
-  mvn package
+  mvn clean package
   ```
 
   You will get `./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar`
