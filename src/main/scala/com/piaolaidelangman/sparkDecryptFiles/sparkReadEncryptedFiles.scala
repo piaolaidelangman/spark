@@ -6,7 +6,6 @@ import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
 
 import java.util.Base64
-import java.nio.file.{Files, Paths}
 
 /**
  * @author diankun.an
@@ -16,7 +15,7 @@ object decryptFiles {
 
     def main(args: Array[String]): Unit = {
 
-        val inputPath = args(0) // path to a txt which contains encrypted files' pwd
+        val inputPath = args(0) // path where contains encrypted files
         val decryptMethod = args(1) // AESGCM or AESCBC
         val secret = args(2)
         val decoder = Base64.getDecoder()

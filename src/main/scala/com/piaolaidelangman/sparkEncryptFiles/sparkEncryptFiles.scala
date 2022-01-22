@@ -30,7 +30,7 @@ object encryptFiles {
           .map{ case (name, bytesData) => {
             val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
             Files.write(tmpOutputPath, task.encryptBytesWithJavaAESGCM(bytesData.toArray, key))
-            tmpOutputPath.toString + " AES/GCM encrypt successfully saved!"
+            tmpOutputPath.toString + " AES-GCM encrypt successfully saved!"
           }}
           output.foreach(println)
 
@@ -39,7 +39,7 @@ object encryptFiles {
           .map{ case (name, bytesData) => {
             val tmpOutputPath = Paths.get(outputPath, name.split("/").last)
             Files.write(tmpOutputPath, task.encryptBytesWithJavaAESCBC(bytesData.toArray, key))
-            tmpOutputPath.toString + " AES/CBC encrypt successfully saved!"
+            tmpOutputPath.toString + " AES-CBC encrypt successfully saved!"
           }}
           output.foreach(println)
         }else{

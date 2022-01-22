@@ -1,8 +1,8 @@
 # Spark Decrypt files
 ### This is a project to encrypt and decrypt files in spark with AES/GCM or AES/CBC.
-## Envirronment
+## Environment
 * [Spark 3.x](https://spark.apache.org/downloads.html)
-* [Sbt](https://www.scala-sbt.org/1.x/docs/Setup.html)
+* [Maven](https://maven.apache.org/)
 
 ## Prepare
 * Files need to be decrypted. Put these files into a folder. These files should be encrypted either by [AES/GCM]() or [AES/CBC]() use a key. I provide a encrypt-files example with both method in [here](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/sparkEncryptFiles.scala).
@@ -11,20 +11,17 @@
 
   run:
   ```bash
-  sbt package
+  mvn package
   ```
-  The output is:
-  ```js
-  [success] Total time: 12 s, completed Jan 3, 2022 10:41:01 AM
-  ```
-  You will get `./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar`
+
+  You will get `./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
 ## Run command
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkCryptoFiles.decryptFiles \
-  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
+  ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
   /tmp/AESCBC \
   AESCBC LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
@@ -33,7 +30,7 @@ or
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkCryptoFiles.decryptFiles \
-  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
+  ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
   /tmp/AESGCM \
   AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```

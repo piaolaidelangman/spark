@@ -6,16 +6,16 @@
 ## Run
 ### Generate secret key:
 
-After [build](https://github.com/piaolaidelangman/spark-read-ecrypted-files#prepare), run:
+After [build](), run:
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkCryptoFiles.testKey \
-  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar
+  /path/to/target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 The output is:
-```js
+```bash
 Successfully generate key:
 LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
@@ -25,8 +25,8 @@ LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkCryptoFiles.encryptFiles \
-  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
-  ./sparkEncryptFiles/originData \
+  /path/to/target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
+  ./originData \
   /tmp/AESCBC \
   AESCBC LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
@@ -35,8 +35,8 @@ or
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
   --class sparkCryptoFiles.encryptFiles \
-  ./target/scala-2.12/sparkcryptofiles_2.12-0.1.0.jar \
-  ./sparkEncryptFiles/originData \
+  /path/to/target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
+  ./originData \
   /tmp/AESGCM \
   AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
