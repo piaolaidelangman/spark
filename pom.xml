@@ -49,7 +49,7 @@
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
         <version>3.4.2</version>
-        <executions>
+        <!-- <executions>
           <execution>
             <id>scala-compile-first</id>
             <phase>process-resources</phase>
@@ -57,7 +57,7 @@
               <goal>compile</goal>
             </goals>
           </execution>
-        </executions>
+        </executions> -->
         <configuration>
           <scalaVersion>2.12.2</scalaVersion>
           <recompileMode>incremental</recompileMode>

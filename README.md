@@ -9,7 +9,6 @@
 
 * Build
 
-  run:
   ```bash
   mvn clean package
   ```
