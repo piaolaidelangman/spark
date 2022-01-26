@@ -11,7 +11,7 @@ import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretK
 /**
  * @author diankun.an
  */
-class encryptTask extends Serializable{
+class EncryptTask extends Serializable{
 
   def encryptBytesWithJavaAESGCM(content: Array[Byte], key: Array[Byte]): Array[Byte] = {
 
@@ -73,16 +73,16 @@ class encryptTask extends Serializable{
     dataOutStream.write(hmac)
 
     if (timestamp == null) {
-        throw new cryptoException("Timestamp cannot be null")
+        throw new CryptoException("Timestamp cannot be null")
     }
     if (ivParameterSpec == null || ivParameterSpec.getIV().length != 16) {
-        throw new cryptoException("Initialization Vector must be 128 bits")
+        throw new CryptoException("Initialization Vector must be 128 bits")
     }
     if (cipherText == null || cipherText.length % 16 != 0) {
-        throw new cryptoException("Ciphertext must be a multiple of 128 bits")
+        throw new CryptoException("Ciphertext must be a multiple of 128 bits")
     }
     if (hmac == null || hmac.length != 32) {
-        throw new cryptoException("Hmac must be 256 bits")
+        throw new CryptoException("Hmac must be 256 bits")
     }
 
     val resultString = new String(encoder.encodeToString(outByteStream.toByteArray()))

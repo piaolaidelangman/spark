@@ -13,7 +13,7 @@ import java.time.Instant
  * @author diankun.an
  */
 
-class decryptTask extends Serializable{
+class DecryptTask extends Serializable{
 
   def decryptBytesWithJavaAESGCM(content: Array[Byte], key: Array[Byte], keyLen: Int = 128): Array[Byte] = {
     val cipherTextWithIV = content
@@ -65,7 +65,7 @@ class decryptTask extends Serializable{
     new String(cipher.doFinal(cipherText))
   }
 
-  def read(stream: DataInputStream, numBytes: Int): Array[Byte]={
+  private def read(stream: DataInputStream, numBytes: Int): Array[Byte]={
     val retval = new Array[Byte](numBytes)
     val bytesRead: Int = stream.read(retval)
     if (bytesRead < numBytes) {
