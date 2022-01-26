@@ -36,7 +36,7 @@ class DecryptTask extends Serializable{
 
     val version: Byte = dataStream.readByte()
     if(version.compare((0x80).toByte) != 0){
-      throw new cryptoException("Version error!")
+      throw new CryptoException("Version error!")
     }
     val encryptKey: Array[Byte] = copyOfRange(secret, 16, 32)
 
