@@ -23,7 +23,7 @@
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
-  --class sparkCryptoFiles.testKey \
+  --class sparkCryptoFiles.GenerateKey \
   ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
@@ -37,36 +37,28 @@ LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
-  --class sparkCryptoFiles.encryptFiles \
+  --class sparkCryptoFiles.SparkEncryptFiles \
   ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
-  ./src/main/scala/com/piaolaidelangman/sparkEncryptFiles/originData/ \
+  ./src/main/scala/com/piaolaidelangman/originData/ \
   /tmp/AESCBC \
-  AESCBC LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
+  AESCBC \
+  LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
-or
-```bash
-$SPARK_HOME/bin/spark-submit \
-  --master local[2] \
-  --class sparkCryptoFiles.encryptFiles \
-  ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
-  ./src/main/scala/com/piaolaidelangman/sparkEncryptFiles/originData/ \
-  /tmp/AESGCM \
-  AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
-```
-I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/src/main/scala/com/piaolaidelangman/sparkEncryptFiles/originData) and the output is:
+
+I use [iris.csv](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/src/main/scala/com/piaolaidelangman/originData) and the output is:
 
 ```bash
-/tmp/AESGCM/iris_2.csv AES-GCM encrypt successfully saved!
-/tmp/AESGCM/iris_1.csv AES-GCM encrypt successfully saved!
+/tmp/AESGCM/iris_2.csv AES-CBC encrypt successfully saved!
+/tmp/AESGCM/iris_1.csv AES-CBC encrypt successfully saved!
 ```
-Then I get the `iris.csv`(Encrypted) in folder `/tmp/AESGCM`.
+Then I get the `iris.csv`(Encrypted) in folder `/tmp/AESCSC`.
 
 Please modify the path in the command according to your needs.
 
 ### **Usage**
 * inputPath: String. A folder contains encrypt files.
 * outputPath: String. The path where encrypted files to be saved.
-* encryptMethod: String. "AESCBC" or "AESGCM". A method used to decrypt files.
+* encryptMethod: String. **"AESCBC"** or **"AESGCM"**. A method used to decrypt files.
 * secret: String. "AESCBC" or "AESGCM" encrypt method needs this parameter.
 
 ## Decrypt files
@@ -74,20 +66,13 @@ Please modify the path in the command according to your needs.
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[2] \
-  --class sparkCryptoFiles.decryptFiles \
+  --class sparkCryptoFiles.SparkDecryptFiles \
   ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
   /tmp/AESCBC \
-  AESCBC LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
+  AESCBC \
+  LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
 ```
-or
-```bash
-$SPARK_HOME/bin/spark-submit \
-  --master local[2] \
-  --class sparkCryptoFiles.decryptFiles \
-  ./target/sparkcryptofiles-1.0-SNAPSHOT-jar-with-dependencies.jar \
-  /tmp/AESGCM \
-  AESGCM LDlxjm0y3HdGFniIGviJnMJbmFI+lt3dfIVyPJm1YSY=
-```
+
 The output is:
 ```bash
 +------------+-----------+------------+-----------+---------------+
@@ -121,7 +106,7 @@ Please modify the path in the command according to your needs.
 
 ### **Usage**
 * inputPath: String. A folder contains encrypt files.
-* decryptMethod: String. "AESCBC" or "AESGCM". A method used to decrypt files according your encrypt method.
+* decryptMethod: String. **"AESCBC"** or **"AESGCM"**. A method used to decrypt files according your encrypt method.
 * secret: String. "AESCBC" or "AESGCM" decrypt method needs this parameter.
 
-There are more decrypt files demo in [src/main/scala/com/piaolaidelangman/sparkDecryptFiles/](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/src/main/scala/com/piaolaidelangman/sparkDecryptFiles). For [example](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/src/main/scala/com/piaolaidelangman/sparkDecryptFiles/encryptColumn.scala), encrypt some column from a encrypted table then save to file.
+There are more decrypt files demo in [src/main/scala/com/piaolaidelangman/sparkDecryptFiles/](https://github.com/piaolaidelangman/spark-read-ecrypted-files/tree/main/src/main/scala/com/piaolaidelangman/sparkDecryptFiles). For [example](https://github.com/piaolaidelangman/spark-read-ecrypted-files/blob/main/src/main/scala/com/piaolaidelangman/sparkDecryptFiles/EncryptColumnFromDifferentTables.scala), encrypt some column from encrypted tables with different columns then save to files.

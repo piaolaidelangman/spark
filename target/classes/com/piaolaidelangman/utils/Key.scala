@@ -18,7 +18,7 @@ class Key extends Serializable{
 
 }
 
-object testKey{
+object GenerateKey{
 
     def main(args: Array[String]): Unit = {
         val key: Key = new Key()

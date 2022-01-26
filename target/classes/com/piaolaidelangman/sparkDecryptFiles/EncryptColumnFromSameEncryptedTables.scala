@@ -11,7 +11,7 @@ import java.util.Base64
  * @author diankun.an
  */
 
-object encryptColumn {
+object EncryptColumnFromSameEncryptedTables {
 
     def main(args: Array[String]): Unit = {
 
