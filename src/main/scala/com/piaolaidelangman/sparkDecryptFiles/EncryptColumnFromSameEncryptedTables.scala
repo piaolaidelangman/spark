@@ -24,7 +24,7 @@ object EncryptColumnFromSameEncryptedTables {
         val key = decoder.decode(decoder.decode(encoder.encodeToString(secret.getBytes)))
 
         val sc = new SparkContext()
-        val task: decryptTask = new decryptTask()
+        val task = new DecryptTask()
         var decryption = sc.emptyRDD[String]
         
         if (decryptMethod == "AESGCM"){
@@ -59,7 +59,7 @@ object EncryptColumnFromSameEncryptedTables {
         df.printSchema()
         df.show()
 
-        val encryptTask: encryptTask = new encryptTask()
+        val encryptTask = new EncryptTask()
         val convertCase =  (x:String) => {
             new String(encryptTask.encryptBytesWithJavaAESCBC(x.getBytes, key))
         }

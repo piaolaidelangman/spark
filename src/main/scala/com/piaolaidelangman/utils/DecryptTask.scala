@@ -36,7 +36,7 @@ class DecryptTask extends Serializable{
 
     val version: Byte = dataStream.readByte()
     if(version.compare((0x80).toByte) != 0){
-      throw new cryptoException("Version error!")
+      throw new CryptoException("Version error!")
     }
     val encryptKey: Array[Byte] = copyOfRange(secret, 16, 32)
 
@@ -49,13 +49,13 @@ class DecryptTask extends Serializable{
 
     val hmac: Array[Byte] = read(dataStream, 32)
     if(initializationVector.length != 16){
-      throw new cryptoException("Initialization Vector must be 128 bits")
+      throw new CryptoException("Initialization Vector must be 128 bits")
     }
     if (cipherText == null || cipherText.length % 16 != 0) {
-        throw new cryptoException("Ciphertext must be a multiple of 128 bits")
+        throw new CryptoException("Ciphertext must be a multiple of 128 bits")
     }
     if (hmac == null || hmac.length != 32) {
-        throw new cryptoException("hmac must be 256 bits")
+        throw new CryptoException("hmac must be 256 bits")
     }
 
     val secretKeySpec = new SecretKeySpec(encryptKey, "AES")
@@ -69,7 +69,7 @@ class DecryptTask extends Serializable{
     val retval = new Array[Byte](numBytes)
     val bytesRead: Int = stream.read(retval)
     if (bytesRead < numBytes) {
-      throw new cryptoException("Not enough bits to read!")
+      throw new CryptoException("Not enough bits to read!")
     }
     retval
   }
